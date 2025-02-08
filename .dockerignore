@@ -1,0 +1,11 @@
+.venv
+.env*
+.gitignore
+.pre-commit-config.yaml
+app.log
+LICENSE
+README.md
+.github
+*.sqlite
+docker-compose.yml
+Dockerfile

@@ -1,0 +1,19 @@
+name: avto-discord-bot
+services:
+    python-bot:
+        build: .
+        pull_policy: build
+        restart: always
+        env_file:
+            - stack.env
+        environment:
+            - DB_PATH=/db/avto_db.sqlite
+            - DISPLAY=:0
+        volumes:
+            - db:/db
+            - /tmp/.X11-unix:/tmp/.X11-unix
+        command: ["poetry", "run", "python", "main.py"]
+
+volumes:
+  db:
+    name: avto-db
