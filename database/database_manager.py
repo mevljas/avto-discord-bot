@@ -106,7 +106,7 @@ class DatabaseManager:
     async def save_listing(
         self,
         item_id: str,
-        data: tuple[str, int, int, int ,str ,str, str, str, int, str | None],
+        data: tuple[str, int, int, int, str, str, str, str, int, str | None],
     ):
         """
         Saved a crawled listing to the db.
