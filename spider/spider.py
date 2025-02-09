@@ -31,8 +31,6 @@ async def run_spider(database_manager: DatabaseManager):
         for channel, page_url in config:
             logger.debug("Processing channel %s with URL %s", channel, page_url)
 
-            discord_listings[channel] = []
-
             # create a new page inside context.
             browser_page = await browser.new_page(
                 # pylint: disable=line-too-long
