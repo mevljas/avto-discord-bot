@@ -113,7 +113,7 @@ class DatabaseManager:
         """
         logger.debug("Saving new listing %s to the database.", item_id)
 
-        _, _, _, prices, _, _, _, _, _, url = data
+        _, _, _, _, _, _, url, prices, _ = data
 
         async with self.async_session_factory()() as session:
             try:

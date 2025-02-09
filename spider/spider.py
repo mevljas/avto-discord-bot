@@ -46,21 +46,14 @@ async def run_spider(database_manager: DatabaseManager):
 
             more_pages = True
 
-            index = 1
 
             results = {}
 
             error = False
 
+            await browser_page.goto(page_url)
+
             while more_pages:
-                if index > 1:
-                    # Close the previous page.
-                    await browser_page.close()
-
-                    # create a new page.
-                    browser_page = await browser.new_page()
-
-                    await browser_page.goto(f"{page_url}&stran={index}")
 
                 try:
                     results_tmp, more_pages = await parse_page(
@@ -70,7 +63,9 @@ async def run_spider(database_manager: DatabaseManager):
                 except Exception as e:  # pylint: disable=broad-except
                     logger.error("Error parsing page: %s", e)
                     error = True
-                index += 1
+
+                if more_pages:
+                    await browser_page.click("//*[@id='GO-naviprevnext']/li[contains(@class, 'GO-Rounded-R')]")
 
             for avto_id, new_data in results.items():
                 logger.debug("Listing ID: %s", avto_id)
@@ -78,7 +73,7 @@ async def run_spider(database_manager: DatabaseManager):
                 if avto_id in saved_results:
                     logger.debug("Listing already saved.")
 
-                    _, _, _, _, _, _, _, new_price, _, = new_data
+                    _, _, _, _, _, _, _, _, new_price, _, = new_data
 
                     listing_id, old_prices = saved_results[avto_id]
 
@@ -93,7 +88,8 @@ async def run_spider(database_manager: DatabaseManager):
 
                         # Merge old and new prices.
                         old_prices.append(new_price)
-                        new_data = new_data[:3] + (old_prices,) + new_data[4:]
+                        print("Old prices: ", old_prices)
+                        new_data = new_data[:7] + (old_prices,) + new_data[8:]
 
                         print("New data after merging: ", new_data)
 
@@ -110,7 +106,7 @@ async def run_spider(database_manager: DatabaseManager):
                 await database_manager.save_listing(avto_id, new_data)
 
                 # Convert price to a list of prices
-                new_data = new_data[:3] + ([new_data[3]],) + new_data[4:]
+                new_data = new_data[:7] + ([new_data[7]],) + new_data[8:]
                 discord_listings[channel].append(new_data)
             await browser_page.close()
 

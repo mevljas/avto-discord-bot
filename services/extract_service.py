@@ -19,7 +19,9 @@ async def parse_page(
     logger.debug("Parsing page %s.", browser_page.url)
 
     # Reject cookies.
-    await browser_page.locator("#CybotCookiebotDialogBodyButtonDecline").click()
+    # check if the cookie dialog is present.
+    if len(await browser_page.locator("#CybotCookiebotDialogBodyButtonDecline").all()) > 0:
+        await browser_page.locator("#CybotCookiebotDialogBodyButtonDecline").click()
 
     # Wait for the page to load.
     await browser_page.wait_for_load_state("domcontentloaded")
@@ -33,13 +35,18 @@ async def parse_page(
         item_id, data = await parse_result(result)
         extracted_data[item_id] = data
 
+    # Check if the page has next page buttons.
+    has_buttons = len(await browser_page.locator("""
+    //*[@id='GO-naviprevnext']/li[contains(@class, 'GO-Rounded-R')]
+    """).all()) != 0
+
     # Check if next page buttons is disabled. If so, there are no more pages.
-    more_pages = (
-            await browser_page.locator("""
-        xpath=//*[@id='GO-naviprevnext']/li[5]
-        [contains(@class, 'disabled ')]
-        """).count() == 0
-    )
+    more_pages = has_buttons and (len(
+        await browser_page.locator("""
+        //*[@id="GO-naviprevnext"]/li[contains(@class, 'GO-Rounded-R') and contains(@class, 'disabled')]
+        """).all()) == 0)
+
+    logger.debug("More pages: %s", more_pages)
 
     logger.info("Parsing page %s finished.", browser_page.url)
 
@@ -82,9 +89,9 @@ async def parse_result(
             case "Prevoženih":
                 kilometers = int(value.split(" ")[0])
             case "Gorivo":
-                fuel = value
+                fuel = value.split(" ")[0]
             case "Menjalnik":
-                transmission = value
+                transmission = value.split(" ")[0]
 
             case "Motor":
                 engine = value
@@ -104,7 +111,7 @@ async def parse_result(
             'xpath=div[1]/div[2]/div[2]').inner_text()
     else:
         price = await price_group.locator(
-            'xpath=div[1]/div[1]/div').inner_text()
+            'xpath=div[1]/div[1]/div[1]').inner_text()
 
     price = int(price.split(" ")[0].replace(".", ""))
 

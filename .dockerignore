@@ -7,5 +7,5 @@ LICENSE
 README.md
 .github
 *.sqlite
-docker-compose.yml
+docker-compose.*
 Dockerfile

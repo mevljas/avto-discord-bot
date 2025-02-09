@@ -61,39 +61,48 @@ class MyDiscordClient(discord.Client):
             await channel.send(f"Found {len(listings)} new listings.")
 
             for listing in listings:
-                title, image_url, description, prices, size, year, floor, url = listing
+                title, year, kilometers, transmission, fuel, engine, url, prices, image_url, = listing
 
                 logging.debug("Listing: %s", listing)
 
                 embed = discord.Embed(
                     title=title,
                     url=url,
-                    description=description,
                     color=discord.Color.blue(),
                 )
                 if image_url:
                     embed.set_image(url=image_url)
                 embed.add_field(
-                    name="**Cena**",
-                    value=f"{prices[0]:.2f} €",
-                    inline=True,
-                )
-                embed.add_field(
-                    name="**Velikost**",
-                    value=f"{size:.2f} m²",
-                    inline=True,
-                )
-                embed.add_field(
-                    name="**Zgrajeno leta**",
+                    name="**Letnik**",
                     value=year,
                     inline=True,
                 )
                 embed.add_field(
-                    name="**Nadstropje**",
-                    value=floor,
+                    name="**Kilometri**",
+                    value=f"{kilometers} km",
                     inline=True,
                 )
-
+                embed.add_field(
+                    name="**Menjalnik**",
+                    value=transmission,
+                    inline=True,
+                )
+                embed.add_field(
+                    name="**Gorivo**",
+                    value=fuel,
+                    inline=True,
+                )
+                embed.add_field(
+                    name="**Motor**",
+                    value=engine,
+                    inline=True,
+                )
+                embed.add_field(
+                    name="**Cena**",
+                    value=f"{prices[0]:.2f} €",
+                    inline=True,
+                )
+                
                 if len(prices) > 1:
                     embed.add_field(
                         name="**Prejšnje cene**",
