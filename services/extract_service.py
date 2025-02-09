@@ -1,4 +1,5 @@
 """Module that contains data extraction logic."""
+
 from urllib.parse import parse_qs
 from urllib.parse import urlparse
 
@@ -8,7 +9,7 @@ from logger.logger import logger
 
 
 async def parse_page(
-        browser_page: Page,
+    browser_page: Page,
 ) -> tuple[dict[int, tuple[str, int, int, str, str, str, str, int, str]], bool]:
     """Parses the page and extracts data.
     Returns a dictionary of listings and a boolean if there are more pages.
@@ -20,7 +21,10 @@ async def parse_page(
 
     # Reject cookies.
     # check if the cookie dialog is present.
-    if len(await browser_page.locator("#CybotCookiebotDialogBodyButtonDecline").all()) > 0:
+    if (
+        len(await browser_page.locator("#CybotCookiebotDialogBodyButtonDecline").all())
+        > 0
+    ):
         await browser_page.locator("#CybotCookiebotDialogBodyButtonDecline").click()
 
     # Wait for the page to load.
@@ -28,7 +32,10 @@ async def parse_page(
 
     extracted_data = {}
 
-    results = await browser_page.locator("//*[@id='results']/div[contains(@class, 'GO-Results-Row')]").all()
+    # pylint: disable=line-too-long
+    results = await browser_page.locator(
+        "//*[@id='results']/div[contains(@class, 'GO-Results-Row')]"
+    ).all()
 
     # Loop through all the listings.
     for result in results:
@@ -36,15 +43,28 @@ async def parse_page(
         extracted_data[item_id] = data
 
     # Check if the page has next page buttons.
-    has_buttons = len(await browser_page.locator("""
+    has_buttons = (
+        len(
+            await browser_page.locator(
+                """
     //*[@id='GO-naviprevnext']/li[contains(@class, 'GO-Rounded-R')]
-    """).all()) != 0
+    """
+            ).all()
+        )
+        != 0
+    )
 
     # Check if next page buttons is disabled. If so, there are no more pages.
-    more_pages = has_buttons and (len(
-        await browser_page.locator("""
+    more_pages = has_buttons and (
+        len(
+            await browser_page.locator(
+                """
         //*[@id="GO-naviprevnext"]/li[contains(@class, 'GO-Rounded-R') and contains(@class, 'disabled')]
-        """).all()) == 0)
+        """
+            ).all()
+        )
+        == 0
+    )
 
     logger.debug("More pages: %s", more_pages)
 
@@ -53,20 +73,25 @@ async def parse_page(
     return extracted_data, more_pages
 
 
+# pylint: disable=(too-many-locals
 async def parse_result(
-        item: Locator,
+    item: Locator,
 ) -> tuple[int, tuple[str, int, int, str, str, str, str, int, str]]:
     """Extracts data from the result."""
 
     logger.debug("Extracting result data...")
 
-    image_url = (await item.locator(
+    image_url = await item.locator(
         'xpath=div[contains(@class, "GO-Results-Photo")]/div/a/img'
-    ).first.get_attribute("src"))
+    ).first.get_attribute("src")
 
-    title = await item.locator('xpath=div[contains(@class, "GO-Results-Naziv ")]/span').inner_text()
+    title = await item.locator(
+        'xpath=div[contains(@class, "GO-Results-Naziv ")]/span'
+    ).inner_text()
 
-    details = item.locator('xpath=div[contains(@class, "GO-Results-Data")]/div/table/tbody')
+    details = item.locator(
+        'xpath=div[contains(@class, "GO-Results-Data")]/div/table/tbody'
+    )
 
     rows = await details.locator("tr").all()
 
@@ -98,26 +123,36 @@ async def parse_result(
             case _:
                 logger.warning("Unknown table details name: %s", name)
 
-    url = (await (item.locator('xpath=a[contains(@class, "stretched-link")]')
-                  .first.get_attribute("href")))[2:]
+    url = (
+        await item.locator(
+            'xpath=a[contains(@class, "stretched-link")]'
+        ).first.get_attribute("href")
+    )[2:]
 
     # fix relative url.
     url = f"https://www.avto.net{url}"
 
     # check whether the item contains sale css class.
     price_group = item.locator('xpath=div[contains(@class, "GO-Results-PriceLogo")]')
-    if len(await price_group.locator('xpath=div[contains(@class, "GO-Results-Price-Akcija")]').all()) > 0:
-        price = await price_group.locator(
-            'xpath=div[1]/div[2]/div[2]').inner_text()
+
+    # pylint: disable=line-too-long
+    if (
+        len(
+            await price_group.locator(
+                'xpath=div[contains(@class, "GO-Results-Price-Akcija")]'
+            ).all()
+        )
+        > 0
+    ):
+        price = await price_group.locator("xpath=div[1]/div[2]/div[2]").inner_text()
     else:
-        price = await price_group.locator(
-            'xpath=div[1]/div[1]/div[1]').inner_text()
+        price = await price_group.locator("xpath=div[1]/div[1]/div[1]").inner_text()
 
     price = int(price.split(" ")[0].replace(".", ""))
 
     parsed_url = urlparse(url)
 
-    item_id = int(parse_qs(parsed_url.query)['id'][0])
+    item_id = int(parse_qs(parsed_url.query)["id"][0])
 
     logger.debug(
         """

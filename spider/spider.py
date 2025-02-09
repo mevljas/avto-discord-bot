@@ -46,7 +46,6 @@ async def run_spider(database_manager: DatabaseManager):
 
             more_pages = True
 
-
             results = {}
 
             error = False
@@ -65,7 +64,10 @@ async def run_spider(database_manager: DatabaseManager):
                     error = True
 
                 if more_pages:
-                    await browser_page.click("//*[@id='GO-naviprevnext']/li[contains(@class, 'GO-Rounded-R')]")
+                    # pylint: disable=line-too-long
+                    await browser_page.click(
+                        "//*[@id='GO-naviprevnext']/li[contains(@class, 'GO-Rounded-R')]"
+                    )
 
             for avto_id, new_data in results.items():
                 logger.debug("Listing ID: %s", avto_id)
@@ -73,7 +75,18 @@ async def run_spider(database_manager: DatabaseManager):
                 if avto_id in saved_results:
                     logger.debug("Listing already saved.")
 
-                    _, _, _, _, _, _, _, _, new_price, _, = new_data
+                    (
+                        _,
+                        _,
+                        _,
+                        _,
+                        _,
+                        _,
+                        _,
+                        _,
+                        new_price,
+                        _,
+                    ) = new_data
 
                     listing_id, old_prices = saved_results[avto_id]
 

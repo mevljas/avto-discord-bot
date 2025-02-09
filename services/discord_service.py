@@ -61,7 +61,18 @@ class MyDiscordClient(discord.Client):
             await channel.send(f"Found {len(listings)} new listings.")
 
             for listing in listings:
-                title, year, kilometers, transmission, fuel, engine, url, prices, image_url, = listing
+                # pylint: disable=line-too-long
+                (
+                    title,
+                    year,
+                    kilometers,
+                    transmission,
+                    fuel,
+                    engine,
+                    url,
+                    prices,
+                    image_url,
+                ) = listing
 
                 logging.debug("Listing: %s", listing)
 
@@ -102,7 +113,7 @@ class MyDiscordClient(discord.Client):
                     value=f"{prices[0]:.2f} €",
                     inline=True,
                 )
-                
+
                 if len(prices) > 1:
                     embed.add_field(
                         name="**Prejšnje cene**",
