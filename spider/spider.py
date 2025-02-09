@@ -1,5 +1,6 @@
 # pylint: disable=too-many-locals
 """Module that contains main spider logic."""
+import sqlite3
 from collections import defaultdict
 
 from playwright.async_api import async_playwright
@@ -110,7 +111,11 @@ async def run_spider(database_manager: DatabaseManager):
                 # We found a new listing.
                 logger.debug("New listing found %s.", avto_id)
 
-                await database_manager.save_listing(avto_id, new_data)
+                try:
+                    await database_manager.save_listing(avto_id, new_data)
+                except sqlite3.IntegrityError as e:
+                    logger.warning("""Error saving duplicate listing: %d, 
+                    error: %s, data: %s""", avto_id, e, new_data)
 
                 # Convert price to a list of prices
                 new_data = new_data[:7] + ([new_data[7]],) + new_data[8:]
