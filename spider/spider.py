@@ -13,7 +13,7 @@ async def run_spider(database_manager: DatabaseManager):
     """
     Setups the playwright library and starts the crawler.
     """
-    logger.info("Spider started.")
+    logger.debug("Spider started.")
 
     # Dictionary to store the listings. Key is the channel name.
     discord_listings = defaultdict(list)
@@ -29,7 +29,7 @@ async def run_spider(database_manager: DatabaseManager):
 
         # For each url, send the results to a different channel.
         for channel, page_url in config:
-            logger.info("Processing channel %s with URL %s", channel, page_url)
+            logger.debug("Processing channel %s with URL %s", channel, page_url)
 
             discord_listings[channel] = []
 
@@ -92,7 +92,7 @@ async def run_spider(database_manager: DatabaseManager):
                     listing_id, old_prices = saved_results[avto_id]
 
                     if old_prices[-1] != new_price:
-                        logger.info("New saved_price detected for %s.", avto_id)
+                        logger.debug("New saved_price detected for %s.", avto_id)
                         await database_manager.add_new_price(
                             listing_id=listing_id,
                             current_price=new_price,
@@ -110,7 +110,7 @@ async def run_spider(database_manager: DatabaseManager):
                     continue
 
                 # We found a new listing.
-                logger.info("New listing found %s.", avto_id)
+                logger.debug("New listing found %s.", avto_id)
 
                 await database_manager.save_listing(avto_id, new_data)
 
