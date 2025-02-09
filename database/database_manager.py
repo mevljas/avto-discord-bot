@@ -166,7 +166,7 @@ class DatabaseManager:
 
             # Convert the comma-separated string back to a list of prices
             listings_with_prices = {
-                item[0]: (
+                int(item[0]): (
                     item[1],
                     [float(price) for price in item[2].split(",")] if item[2] else [],
                 )

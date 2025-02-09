@@ -31,6 +31,8 @@ async def run_spider(database_manager: DatabaseManager):
         for channel, page_url in config:
             logger.info("Processing channel %s with URL %s", channel, page_url)
 
+            discord_listings[channel] = []
+
             # create a new page inside context.
             browser_page = await browser.new_page(
                 # pylint: disable=line-too-long
@@ -83,7 +85,6 @@ async def run_spider(database_manager: DatabaseManager):
                         _,
                         _,
                         _,
-                        _,
                         new_price,
                         _,
                     ) = new_data
@@ -97,14 +98,9 @@ async def run_spider(database_manager: DatabaseManager):
                             current_price=new_price,
                         )
 
-                        print("New data before merging: ", new_data)
-
                         # Merge old and new prices.
                         old_prices.append(new_price)
-                        print("Old prices: ", old_prices)
                         new_data = new_data[:7] + (old_prices,) + new_data[8:]
-
-                        print("New data after merging: ", new_data)
 
                         discord_listings[channel].append(new_data)
 
@@ -124,7 +120,7 @@ async def run_spider(database_manager: DatabaseManager):
             await browser_page.close()
 
     await browser.close()
-    logger.info("Spider finished. Found %d new listings.", len(discord_listings))
+    logger.info("Spider finished.")
 
     return discord_listings, error
 
