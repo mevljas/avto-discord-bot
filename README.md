@@ -23,7 +23,7 @@ poetry install
 ### Install Playwright browsers (chromium, firefox, webkit)
 
 ```bash
-playwright install chromium
+poetry run playwright install chromium
 ```
 
 ## Configure the bot
