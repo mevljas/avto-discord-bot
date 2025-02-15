@@ -44,25 +44,21 @@ async def parse_page(
 
     # Check if the page has next page buttons.
     has_buttons = (
-        len(
-            await browser_page.locator(
-                """
+        await browser_page.locator(
+            """
     //*[@id='GO-naviprevnext']/li[contains(@class, 'GO-Rounded-R')]
     """
-            ).all()
-        )
+        ).count()
         != 0
     )
 
     # Check if next page buttons is disabled. If so, there are no more pages.
     more_pages = has_buttons and (
-        len(
-            await browser_page.locator(
-                """
+        await browser_page.locator(
+            """
         //*[@id="GO-naviprevnext"]/li[contains(@class, 'GO-Rounded-R') and contains(@class, 'disabled')]
         """
-            ).all()
-        )
+        ).count()
         == 0
     )
 
