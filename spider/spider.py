@@ -42,10 +42,6 @@ async def run_spider(database_manager: DatabaseManager):
             # Prevent loading some resources for better performance.
             # await browser_page.route("**/*", block_aggressively)
 
-            await browser_page.goto(page_url)
-
-            # await browser_page.pause()
-
             more_pages = True
 
             results = {}
