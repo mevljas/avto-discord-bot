@@ -82,10 +82,8 @@ async def parse_result(
         'xpath=div[contains(@class, "GO-Results-Photo")]/div/a/img'
     )
 
-    if await image_locator.count() == 0:
-        image_url = await item.locator(
-            'xpath=div[contains(@class, "GO-Results-Photo")]/div/a/img'
-        ).first.get_attribute("src")
+    if await image_locator.count() > 0:
+        image_url = await image_locator.first.get_attribute("src")
     else:
         image_url = None
 
