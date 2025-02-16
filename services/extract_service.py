@@ -78,7 +78,9 @@ async def parse_result(
     logger.debug("Extracting result data...")
 
     # Check if image is present.
-    image_locator = item.locator('xpath=div[contains(@class, "GO-Results-Photo")]/div/a/img')
+    image_locator = item.locator(
+        'xpath=div[contains(@class, "GO-Results-Photo")]/div/a/img'
+    )
 
     if await image_locator.count() == 0:
         image_url = await item.locator(
