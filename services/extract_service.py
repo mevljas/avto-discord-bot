@@ -139,11 +139,9 @@ async def parse_result(
 
     # pylint: disable=line-too-long
     if (
-        len(
-            await price_group.locator(
-                'xpath=div[contains(@class, "GO-Results-Price-Akcija")]'
-            ).all()
-        )
+        await price_group.locator(
+            'xpath=div[contains(@class, "GO-Results-Price-Akcija")]'
+        ).count()
         > 0
     ):
         price = await price_group.locator("xpath=div[1]/div[2]/div[2]").inner_text()
